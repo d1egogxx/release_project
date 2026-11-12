@@ -22,10 +22,25 @@ class GameSprite(pygame.sprite.Sprite):
         self.rect.y = y
         
     def reset(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        screen.blit(self.image, (self.rect, self.image))
         
+
 class Player(GameSprite):
-    pass
+        
+    def __init__(self, filename, x, y, w, h, speed):
+        super().__init__(filename, x, y, w, h)
+        self.speed = speed
+        
+            
+    def walking(self):
+        keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_RIGHT] and self.rect.right < WINDOW_WIDTH:
+            self.rect.x += self.speed
+        
+        if keys[pygame.K_LEFT] and self.rect.left > 0:
+            self.rect.x -= self.speed
+
 
 
 
