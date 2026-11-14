@@ -10,7 +10,7 @@ light.fill((255, 220, 130))
 light.set_alpha(25)
 
 font = pygame.font.SysFont("georgia", 36, bold = True)
-
+hint_font = pygame.font.SysFont("georgia", 20, bold = True)
 
 pygame.display.set_caption("")
 
@@ -57,7 +57,7 @@ class Player(GameSprite):
 
 
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
-cabinet = pygame.Rect(750)
+cabinet = pygame.Rect(735, 185, 138, 160)
 
 run = True
 
@@ -68,12 +68,19 @@ while run == True:
     screen.blit(background, (0,0))
     
     player.walking()
+    touching_cabinet = player.rect.colliderect(cabinet)
+    if touching_cabinet:
+        hint = hint_font.render("Натисни Е щоб взаємодіяти", True, (150, 0, 0))
+        screen.blit(hint, (300, 100))
+    
     player.reset(screen)
     
     task1 = font.render("Знайди ключ", True, (150, 0, 0))
     screen.blit(task1, (310, 30))
     
     screen.blit(light, (0,0))
+    
+    
     
     
     
