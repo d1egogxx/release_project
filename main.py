@@ -41,8 +41,13 @@ class Player(GameSprite):
         self.speed = speed
         
         self.images = {
-            "idle": pygame.image.load("player_stand.png")
+            "idle": pygame.image.load("player_stand.png"),
+            "walking_right" : pygame.image.load("player_walking_right.png"),
+            "walking_left" : pygame.image.load("player_walking_left.png")
         }
+        
+        for state in self.images:
+            self.images[state] = pygame.transform.smoothscale(self.images[state], (w,h))
         
         self.state = "idle"
         
@@ -51,9 +56,14 @@ class Player(GameSprite):
         
         if keys[pygame.K_RIGHT] and self.rect.right < WINDOW_WIDTH:
             self.rect.x += self.speed
+            self.image = self.images["walking_right"]
         
-        if keys[pygame.K_LEFT] and self.rect.left > 250:
+        elif keys[pygame.K_LEFT] and self.rect.left > 250:
             self.rect.x -= self.speed
+            self.image = self.images["walking_left"]
+            
+        else:
+            self.image = self.images["idle"]
 
 
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
