@@ -10,7 +10,7 @@ light.fill((255, 220, 130))
 light.set_alpha(25)
 
 font = pygame.font.SysFont("georgia", 36, bold = True)
-hint_font = pygame.font.SysFont("georgia", 20, bold = True)
+hint_font = pygame.font.SysFont("georgia", 23, bold = True)
 
 pygame.display.set_caption("")
 
@@ -18,6 +18,9 @@ clock = pygame.time.Clock()
 
 background = pygame.image.load("background.jpg")
 background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
+key = pygame.image.load("key.png")
+key = pygame.transform.scale(key, (200, 200))
 
 class GameSprite(pygame.sprite.Sprite):
     def __init__(self, filename, x,y, w, h):
@@ -67,28 +70,62 @@ class Player(GameSprite):
 
 
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
-cabinet = pygame.Rect(735, 185, 138, 160)
+cabinet = pygame.Rect(735, 185, 70, 90)
+door = pygame.Rect(860, 190, 138, 160)
 
+
+task = "Знайди ключ" 
+hint = ""
+door_open = False
 run = True
+key_found = False
+
 
 while run == True:
     
     clock.tick(FPS)
     
     screen.blit(background, (0,0))
+    screen.blit(light, (0,0))
+    
+
     
     player.walking()
+    
+    keys = pygame.key.get_pressed()
     touching_cabinet = player.rect.colliderect(cabinet)
-    if touching_cabinet:
-        hint = hint_font.render("Натисни Е щоб взаємодіяти", True, (150, 0, 0))
-        screen.blit(hint, (300, 100))
+    touching_door = player.rect.colliderect(door)
+    
+    
+    if touching_door and door_open == False:
+        if key_found:
+            hint = "Натисни Е щоб відкрити двері"
+            
+            if keys[pygame.K_e]:
+                door_open = True
+        else: 
+            hint = "Спочатку знайди ключ"
+    
+    if touching_cabinet and key_found == False:
+        hint = "Натисни Е щоб взаємодіяти"
+        
+        if keys[pygame.K_e] and touching_cabinet and key_found == False:
+            key_found = True
+            task = "Відкрий двері"   
+             
+    if key_found == True:
+        screen.blit(key, (350, 140))
+        
+    task_text = font.render(task, True, (150, 0, 0))
+    hint_text = hint_font.render(hint, True, (150, 0, 0))
+    
+    screen.blit(task_text, (310, 30))
+    screen.blit(hint_text, (300, 100))
+        
     
     player.reset(screen)
     
-    task1 = font.render("Знайди ключ", True, (150, 0, 0))
-    screen.blit(task1, (310, 30))
-    
-    screen.blit(light, (0,0))
+        
     
     
     
