@@ -19,6 +19,10 @@ clock = pygame.time.Clock()
 background = pygame.image.load("background.jpg")
 background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
+background_2 = pygame.image.load("background_2.jpg")
+background_2 = pygame.transform.scale(background_2, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
+
 key = pygame.image.load("key.png")
 key = pygame.transform.scale(key, (200, 200))
 
@@ -85,7 +89,11 @@ while run == True:
     
     clock.tick(FPS)
     
-    screen.blit(background, (0,0))
+    if door_open == True:
+        screen.blit(background_2, (0,0))    
+    else:
+        screen.blit(background, (0,0))
+        
     screen.blit(light, (0,0))
     
 
@@ -113,7 +121,7 @@ while run == True:
             key_found = True
             task = "Відкрий двері"   
              
-    if key_found == True:
+    if key_found == True and door_open == False:
         screen.blit(key, (350, 140))
         
     task_text = font.render(task, True, (150, 0, 0))
