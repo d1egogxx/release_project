@@ -97,7 +97,7 @@ enemy_hp = 3
 cabinet = pygame.Rect(735, 185, 70, 90)
 door = pygame.Rect(860, 190, 138, 160)
 table = pygame.Rect(400, 270, 200, 180)
-
+exit = pygame.Rect(72, 190, 100, 180)
 
 task = "Знайди ключ" 
 hint = ""
@@ -126,10 +126,6 @@ while run == True:
         
     screen.blit(light, (0,0))
     
-    
-    
-
-    
     player.walking(door_open)
     player.attack()
     
@@ -137,6 +133,7 @@ while run == True:
     touching_cabinet = player.rect.colliderect(cabinet)
     touching_door = player.rect.colliderect(door)
     touching_table = player.rect.colliderect(table)
+    touching_exit = player.rect.colliderect(exit)
     
     if touching_door and door_open == False:
         if key_found:
@@ -157,6 +154,15 @@ while run == True:
     if key_found == True and door_open == False:
         screen.blit(key, (350, 140))
         
+    if enemy_active == True:
+        enemy.reset(screen)
+        
+        if player.rect.colliderect(enemy.rect) and keys[pygame.K_SPACE]:
+            enemy_active = False
+        
+    if door_open == True and touching_exit == True:
+        enemy_active = True
+        
         
         
     task_text = font.render(task, True, (150, 0, 0))
@@ -169,14 +175,6 @@ while run == True:
     player.reset(screen)
     
         
-    
-    
-    
-    
-    
-    
-    
-    
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
