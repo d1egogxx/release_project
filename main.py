@@ -26,6 +26,9 @@ background_2 = pygame.transform.scale(background_2, (WINDOW_WIDTH, WINDOW_HEIGHT
 key = pygame.image.load("key.png")
 key = pygame.transform.scale(key, (200, 200))
 
+code = pygame.image.load("code.png")
+code = pygame.transform.scale(code, (200, 200))
+
 class GameSprite(pygame.sprite.Sprite):
     def __init__(self, filename, x,y, w, h):
         super().__init__()
@@ -58,14 +61,21 @@ class Player(GameSprite):
         
         self.state = "idle"
         
-    def walking(self):
+    def walking(self, door_open):
         keys = pygame.key.get_pressed()
         
-        if keys[pygame.K_RIGHT] and self.rect.right < WINDOW_WIDTH:
+        if door_open:
+            left_limit = 70
+            right_limit = WINDOW_WIDTH - 70
+        else:
+            left_limit = 250
+            right_limit = WINDOW_WIDTH
+        
+        if keys[pygame.K_RIGHT] and self.rect.right < right_limit:
             self.rect.x += self.speed
             self.image = self.images["walking_right"]
         
-        elif keys[pygame.K_LEFT] and self.rect.left > 250:
+        elif keys[pygame.K_LEFT] and self.rect.left > left_limit:
             self.rect.x -= self.speed
             self.image = self.images["walking_left"]
             
@@ -76,6 +86,7 @@ class Player(GameSprite):
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
 cabinet = pygame.Rect(735, 185, 70, 90)
 door = pygame.Rect(860, 190, 138, 160)
+table = pygame.Rect(400, 270, 200, 180)
 
 
 task = "Знайди ключ" 
@@ -85,25 +96,35 @@ run = True
 key_found = False
 
 
+
 while run == True:
     
     clock.tick(FPS)
     
     if door_open == True:
-        screen.blit(background_2, (0,0))    
+        screen.blit(background_2, (0,0))  
+        task = "Знайди вихід" 
+        hint = " "
+        if touching_table:
+            hint = "Натисни Е щоб взаємодіяти"
+            if keys[pygame.K_e]:
+                screen.blit(code, (300, 150))
+        
     else:
         screen.blit(background, (0,0))
         
     screen.blit(light, (0,0))
     
+    
+    
 
     
-    player.walking()
+    player.walking(door_open)
     
     keys = pygame.key.get_pressed()
     touching_cabinet = player.rect.colliderect(cabinet)
     touching_door = player.rect.colliderect(door)
-    
+    touching_table = player.rect.colliderect(table)
     
     if touching_door and door_open == False:
         if key_found:
@@ -114,7 +135,7 @@ while run == True:
         else: 
             hint = "Спочатку знайди ключ"
     
-    if touching_cabinet and key_found == False:
+    if touching_cabinet and key_found == False and door_open == False:
         hint = "Натисни Е щоб взаємодіяти"
         
         if keys[pygame.K_e] and touching_cabinet and key_found == False:
@@ -123,6 +144,8 @@ while run == True:
              
     if key_found == True and door_open == False:
         screen.blit(key, (350, 140))
+        
+        
         
     task_text = font.render(task, True, (150, 0, 0))
     hint_text = hint_font.render(hint, True, (150, 0, 0))
