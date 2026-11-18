@@ -82,11 +82,18 @@ class Player(GameSprite):
             
         else:
             self.image = self.images["idle"]
-    def attack(self, enemy):
-        pass
+            
+    def attack(self):
+        keys = pygame.key.get_pressed()
+        
+        if keys [pygame.K_SPACE]:
+            self.image = self.images["attack"]
 
 
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
+enemy = GameSprite("enemy.png", 700, 200, 120, 280)
+enemy_hp = 3
+
 cabinet = pygame.Rect(735, 185, 70, 90)
 door = pygame.Rect(860, 190, 138, 160)
 table = pygame.Rect(400, 270, 200, 180)
@@ -97,6 +104,7 @@ hint = ""
 door_open = False
 run = True
 key_found = False
+enemy_active = False
 
 
 
@@ -123,6 +131,7 @@ while run == True:
 
     
     player.walking(door_open)
+    player.attack()
     
     keys = pygame.key.get_pressed()
     touching_cabinet = player.rect.colliderect(cabinet)
