@@ -53,7 +53,8 @@ class Player(GameSprite):
         self.images = {
             "idle": pygame.image.load("player_stand.png"),
             "walking_right" : pygame.image.load("player_walking_right.png"),
-            "walking_left" : pygame.image.load("player_walking_left.png")
+            "walking_left" : pygame.image.load("player_walking_left.png"),
+            "attack" : pygame.image.load("player_attack.png")
         }
         
         for state in self.images:
@@ -81,6 +82,8 @@ class Player(GameSprite):
             
         else:
             self.image = self.images["idle"]
+    def attack(self, enemy):
+        pass
 
 
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
