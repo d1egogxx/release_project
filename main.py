@@ -22,6 +22,9 @@ background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
 background_2 = pygame.image.load("background_2.jpg")
 background_2 = pygame.transform.scale(background_2, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
+background_3 = pygame.image.load("background_3.jpg")
+background_3 = pygame.transform.scale(background_3, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
 
 key = pygame.image.load("key.png")
 key = pygame.transform.scale(key, (200, 200))
@@ -91,7 +94,7 @@ class Player(GameSprite):
 
 
 player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
-enemy = GameSprite("enemy.png", 700, 200, 120, 280)
+enemy = GameSprite("enemy.png", 700, 200, 230, 280)
 enemy_hp = 3
 
 cabinet = pygame.Rect(735, 185, 70, 90)
@@ -104,7 +107,14 @@ hint = ""
 door_open = False
 run = True
 key_found = False
+
 enemy_active = False
+enemy_defeated = False
+
+terminal_open= False
+
+entered_code = ""
+victory = False
 
 
 
@@ -112,7 +122,10 @@ while run == True:
     
     clock.tick(FPS)
     
-    if door_open == True:
+    if victory == True:
+        pass
+        
+    elif door_open == True:
         screen.blit(background_2, (0,0))  
         task = "Знайди вихід" 
         hint = " "
@@ -156,12 +169,31 @@ while run == True:
         
     if enemy_active == True:
         enemy.reset(screen)
+        hint = "Натисніть на пробіл щоб атакувати"
+        task = "Вбий ворога"
+        if enemy.rect.x > player.rect.x:
+            enemy.rect.x -= 1
+        elif enemy.rect.x < player.rect.x:
+            enemy.rect.x += 1
+            
         
         if player.rect.colliderect(enemy.rect) and keys[pygame.K_SPACE]:
             enemy_active = False
+            enemy_defeated = True
         
-    if door_open == True and touching_exit == True:
+    if door_open == True and touching_exit == True and enemy_defeated == False:
         enemy_active = True
+        
+    if door_open == True and touching_exit == True and enemy_defeated == True:
+        hint = "Натисни Е щоб взаємодіяти"
+        if keys[pygame.K_e]:
+            terminal_open = True
+        
+    if terminal_open:
+        pygame.draw.rect(screen, (60,20,20), (280, 150, 400, 240))
+        code_text = hint_font.render(entered_code, True, (0, 0, 0))
+        screen.blit(code_text, (350, 250))
+        
         
         
         
@@ -177,8 +209,28 @@ while run == True:
         
     
     for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN and terminal_open:
+            if event.unicode.isdigit() and len(entered_code) < 4:
+                entered_code += event.unicode
+        
+        if len(entered_code) == 4:
+            if entered_code == "1504":
+                victory = True
+            else:
+                entered_code = ""
+        
         if event.type == pygame.QUIT:
             run = False
+
+    if victory == True:
+        screen.blit(background_3, (0,0))
+            
+        victory_text = font.render("ПЕРЕМОГА!", True, (255,255,255))
+        screen.blit(victory_text, (380, 100))
+            
+        end_text = hint_font.render("Ви втікли з особняка", True, (255, 255, 255))
+        screen.blit(end_text, (390, 160))
+
             
     pygame.display.flip()
             
