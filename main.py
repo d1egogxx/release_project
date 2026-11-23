@@ -101,13 +101,18 @@ class Enemy(GameSprite):
         self.speed = speed
         self.hp = 5
         self.damage = 1
-    
+        
+    def stalking():
+        if enemy.rect.x > player.rect.x:
+            enemy.rect.x -= 1
+        elif enemy.rect.x < player.rect.x:
+            enemy.rect.x += 1
 
 
 
 player = Player(r"game assets/player_stand.png", 260, 200, 140, 280, 2.5)
-enemy = GameSprite(r"game assets/enemy.png", 700, 200, 230, 280)
-enemy_hp = 3
+enemy = Enemy(r"game assets/enemy.png", 700, 200, 230, 280, 2)
+
 
 cabinet = pygame.Rect(735, 185, 70, 90)
 door = pygame.Rect(860, 190, 138, 160)
@@ -183,10 +188,7 @@ while run == True:
         enemy.reset(screen)
         hint = "Натисніть на пробіл щоб атакувати"
         task = "Вбий ворога"
-        if enemy.rect.x > player.rect.x:
-            enemy.rect.x -= 1
-        elif enemy.rect.x < player.rect.x:
-            enemy.rect.x += 1
+        enemy.stalking(player)
             
         
         if player.rect.colliderect(enemy.rect) and keys[pygame.K_SPACE]:
