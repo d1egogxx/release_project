@@ -1,4 +1,8 @@
+import pygame
+
 WINDOW_WIDTH = 960
 WINDOW_HEIGHT = 540
 FPS = 60
+
+
 

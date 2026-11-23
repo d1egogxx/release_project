@@ -12,24 +12,26 @@ light.set_alpha(25)
 font = pygame.font.SysFont("georgia", 36, bold = True)
 hint_font = pygame.font.SysFont("georgia", 23, bold = True)
 
+
+
 pygame.display.set_caption("")
 
 clock = pygame.time.Clock()
 
-background = pygame.image.load("background.jpg")
-background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
+background_path = pygame.image.load(R"game assets\background.jpg")
+background_path = pygame.transform.scale(background_path, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
-background_2 = pygame.image.load("background_2.jpg")
+background_2 = pygame.image.load(R"game assets\background_2.jpg")
 background_2 = pygame.transform.scale(background_2, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
-background_3 = pygame.image.load("background_3.jpg")
+background_3 = pygame.image.load(R"game assets\background_3.jpg")
 background_3 = pygame.transform.scale(background_3, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
 
-key = pygame.image.load("key.png")
+key = pygame.image.load(R"game assets\key.png")
 key = pygame.transform.scale(key, (200, 200))
 
-code = pygame.image.load("code.png")
+code = pygame.image.load(R"game assets\code.png")
 code = pygame.transform.scale(code, (200, 200))
 
 class GameSprite(pygame.sprite.Sprite):
@@ -54,10 +56,10 @@ class Player(GameSprite):
         self.speed = speed
         
         self.images = {
-            "idle": pygame.image.load("player_stand.png"),
-            "walking_right" : pygame.image.load("player_walking_right.png"),
-            "walking_left" : pygame.image.load("player_walking_left.png"),
-            "attack" : pygame.image.load("player_attack.png")
+            "idle": pygame.image.load(R"game assets\player_stand.png"),
+            "walking_right" : pygame.image.load(R"game assets\player_walking_right.png"),
+            "walking_left" : pygame.image.load(R"game assets\player_walking_left.png"),
+            "attack" : pygame.image.load(R"game assets\player_attack.png")
         }
         
         for state in self.images:
@@ -91,10 +93,20 @@ class Player(GameSprite):
         
         if keys [pygame.K_SPACE]:
             self.image = self.images["attack"]
+            
+class Enemy(GameSprite):
+    
+    def __init__(self, filename, x, y, w, h, speed):
+        super().__init__(filename, x, y, w, h)
+        self.speed = speed
+        self.hp = 5
+        self.damage = 1
+    
 
 
-player = Player("player_stand.png", 260, 200, 140, 280, 2.5)
-enemy = GameSprite("enemy.png", 700, 200, 230, 280)
+
+player = Player(r"game assets/player_stand.png", 260, 200, 140, 280, 2.5)
+enemy = GameSprite(r"game assets/enemy.png", 700, 200, 230, 280)
 enemy_hp = 3
 
 cabinet = pygame.Rect(735, 185, 70, 90)
@@ -135,7 +147,7 @@ while run == True:
                 screen.blit(code, (300, 150))
         
     else:
-        screen.blit(background, (0,0))
+        screen.blit(background_path, (0,0))
         
     screen.blit(light, (0,0))
     
