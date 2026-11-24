@@ -54,6 +54,9 @@ class Player(GameSprite):
     def __init__(self, filename, x, y, w, h, speed):
         super().__init__(filename, x, y, w, h)
         self.speed = speed
+        self.hp = 5
+        self.damage = 1
+    
         
         self.images = {
             "idle": pygame.image.load(R"game assets\player_stand.png"),
@@ -93,6 +96,9 @@ class Player(GameSprite):
         
         if keys [pygame.K_SPACE]:
             self.image = self.images["attack"]
+    
+    def take_damage(self, damage):
+        self.hp -= damage
             
 class Enemy(GameSprite):
     
@@ -102,11 +108,14 @@ class Enemy(GameSprite):
         self.hp = 5
         self.damage = 1
         
-    def stalking():
+    def stalking(self, player):
         if enemy.rect.x > player.rect.x:
             enemy.rect.x -= 1
         elif enemy.rect.x < player.rect.x:
             enemy.rect.x += 1
+            
+    def damage(self):
+        self.hp -= 1
 
 
 
@@ -118,6 +127,8 @@ cabinet = pygame.Rect(735, 185, 70, 90)
 door = pygame.Rect(860, 190, 138, 160)
 table = pygame.Rect(400, 270, 200, 180)
 exit = pygame.Rect(72, 190, 100, 180)
+
+restart_button = pygame.Rect(WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 + 70, 300, 60)
 
 task = "Знайди ключ" 
 hint = ""
@@ -133,117 +144,180 @@ terminal_open= False
 entered_code = ""
 victory = False
 
+damage_cooldown = 0
+game_over = False
 
 
 while run == True:
+
     
     clock.tick(FPS)
     
-    if victory == True:
-        pass
+    if game_over == False:
+    
+        if damage_cooldown > 0:
+            damage_cooldown -= 1
         
-    elif door_open == True:
-        screen.blit(background_2, (0,0))  
-        task = "Знайди вихід" 
-        hint = " "
-        if touching_table:
+        if victory == True:
+            pass
+            
+        elif door_open == True:
+            screen.blit(background_2, (0,0))  
+            task = "Знайди вихід" 
+            hint = " "
+            if touching_table:
+                hint = "Натисни Е щоб взаємодіяти"
+                if keys[pygame.K_e]:
+                    screen.blit(code, (300, 150))
+            
+        else:
+            screen.blit(background_path, (0,0))
+            
+        screen.blit(light, (0,0))
+        
+        player.walking(door_open)
+        player.attack()
+        
+        keys = pygame.key.get_pressed()
+        just_pressed = pygame.key.get_just_pressed()
+        
+        touching_cabinet = player.rect.colliderect(cabinet)
+        touching_door = player.rect.colliderect(door)
+        touching_table = player.rect.colliderect(table)
+        touching_exit = player.rect.colliderect(exit)
+        
+        if touching_door and door_open == False:
+            if key_found:
+                hint = "Натисни Е щоб відкрити двері"
+                
+                if keys[pygame.K_e]:
+                    door_open = True
+            else: 
+                hint = "Спочатку знайди ключ"
+        
+        if touching_cabinet and key_found == False and door_open == False:
+            hint = "Натисни Е щоб взаємодіяти"
+            
+            if keys[pygame.K_e] and touching_cabinet and key_found == False:
+                key_found = True
+                task = "Відкрий двері"   
+                
+        if key_found == True and door_open == False:
+            screen.blit(key, (350, 140))
+            
+        if enemy_active == True:
+            enemy.reset(screen)
+            hint = "Натисніть на пробіл щоб атакувати"
+            task = "Вбий ворога"
+            enemy.stalking(player)
+                
+            
+            if player.rect.colliderect(enemy.rect):
+                
+                if just_pressed[pygame.K_SPACE]:
+                    enemy.hp -= player.damage
+                    
+                    if enemy.hp < 0:
+                        enemy_active = False
+                        enemy_defeated = True
+                    
+                elif damage_cooldown == 0:
+                    player.take_damage(enemy.damage)
+                    damage_cooldown = 60
+                    
+                    if player.hp <= 0:
+                        game_over = True
+
+            
+        if door_open == True and touching_exit == True and enemy_defeated == False:
+            enemy_active = True
+            
+        if door_open == True and touching_exit == True and enemy_defeated == True:
             hint = "Натисни Е щоб взаємодіяти"
             if keys[pygame.K_e]:
-                screen.blit(code, (300, 150))
-        
-    else:
-        screen.blit(background_path, (0,0))
-        
-    screen.blit(light, (0,0))
-    
-    player.walking(door_open)
-    player.attack()
-    
-    keys = pygame.key.get_pressed()
-    touching_cabinet = player.rect.colliderect(cabinet)
-    touching_door = player.rect.colliderect(door)
-    touching_table = player.rect.colliderect(table)
-    touching_exit = player.rect.colliderect(exit)
-    
-    if touching_door and door_open == False:
-        if key_found:
-            hint = "Натисни Е щоб відкрити двері"
+                terminal_open = True
             
-            if keys[pygame.K_e]:
-                door_open = True
-        else: 
-            hint = "Спочатку знайди ключ"
-    
-    if touching_cabinet and key_found == False and door_open == False:
-        hint = "Натисни Е щоб взаємодіяти"
+        if terminal_open:
+            pygame.draw.rect(screen, (60,20,20), (280, 150, 400, 240))
+            code_text = hint_font.render(entered_code, True, (0, 0, 0))
+            screen.blit(code_text, (350, 250))
+            
+            
+            
+            
+        task_text = font.render(task, True, (150, 0, 0))
+        hint_text = hint_font.render(hint, True, (150, 0, 0))
         
-        if keys[pygame.K_e] and touching_cabinet and key_found == False:
-            key_found = True
-            task = "Відкрий двері"   
-             
-    if key_found == True and door_open == False:
-        screen.blit(key, (350, 140))
-        
-    if enemy_active == True:
-        enemy.reset(screen)
-        hint = "Натисніть на пробіл щоб атакувати"
-        task = "Вбий ворога"
-        enemy.stalking(player)
+        screen.blit(task_text, (310, 30))
+        screen.blit(hint_text, (300, 100))
             
         
-        if player.rect.colliderect(enemy.rect) and keys[pygame.K_SPACE]:
-            enemy_active = False
-            enemy_defeated = True
+        player.reset(screen)
         
-    if door_open == True and touching_exit == True and enemy_defeated == False:
-        enemy_active = True
+            
         
-    if door_open == True and touching_exit == True and enemy_defeated == True:
-        hint = "Натисни Е щоб взаємодіяти"
-        if keys[pygame.K_e]:
-            terminal_open = True
-        
-    if terminal_open:
-        pygame.draw.rect(screen, (60,20,20), (280, 150, 400, 240))
-        code_text = hint_font.render(entered_code, True, (0, 0, 0))
-        screen.blit(code_text, (350, 250))
-        
-        
-        
-        
-    task_text = font.render(task, True, (150, 0, 0))
-    hint_text = hint_font.render(hint, True, (150, 0, 0))
-    
-    screen.blit(task_text, (310, 30))
-    screen.blit(hint_text, (300, 100))
-        
-    
-    player.reset(screen)
-    
-        
-    
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN and terminal_open:
             if event.unicode.isdigit() and len(entered_code) < 4:
                 entered_code += event.unicode
-        
+            
         if len(entered_code) == 4:
             if entered_code == "1504":
                 victory = True
             else:
                 entered_code = ""
-        
+            
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if game_over and restart_button.collidepoint(event.pos):
+                    
+                player.hp = 5
+                player.rect.topleft = (260, 200)
+                    
+                enemy.hp = 5
+                player.rect.topleft = (260, 200)
+                    
+                task = "Знайди ключ" 
+                task = "Знайди ключ" 
+                hint = ""
+                door_open = False
+                run = True
+                key_found = False
+
+                enemy_active = False
+                enemy_defeated = False
+
+                terminal_open= False
+
+                entered_code = ""
+                victory = False
+
+                damage_cooldown = 0
+                game_over = False
+                    
+            
         if event.type == pygame.QUIT:
             run = False
 
     if victory == True:
-        screen.blit(background_3, (0,0))
+            screen.blit(background_3, (0,0))
+                    
+            victory_text = font.render("ПЕРЕМОГА!", True, (255,255,255))
+            screen.blit(victory_text, (380, 100))
+                    
+            end_text = hint_font.render("Ви втікли з особняка", True, (255, 255, 255))
+            screen.blit(end_text, (390, 160))
             
-        victory_text = font.render("ПЕРЕМОГА!", True, (255,255,255))
-        screen.blit(victory_text, (380, 100))
-            
-        end_text = hint_font.render("Ви втікли з особняка", True, (255, 255, 255))
-        screen.blit(end_text, (390, 160))
+    elif game_over == True: 
+        
+        screen.fill((0, 0, 0))
+        gameover_text = font.render("ВИ ПРОГРАЛИ", True, (200,0,0))
+        screen.blit(gameover_text, (WINDOW_WIDTH // 2 - 160 , WINDOW_HEIGHT // 2 - 80))
+        
+        pygame.draw.rect(screen, (120, 10, 10), restart_button)
+        restart_text = hint_font.render("ПОЧАТИ ЗНОВУ", True, (255, 255, 255))
+        
+        screen.blit(restart_text, (restart_button.centerx - restart_text.get_width() // 2,
+                restart_button.centery - restart_text.get_height() // 2))
 
             
     pygame.display.flip()
