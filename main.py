@@ -14,7 +14,13 @@ hint_font = pygame.font.SysFont("georgia", 23, bold = True)
 
 
 
-pygame.display.set_caption("")
+pygame.display.set_caption("My release project")
+
+pygame.mixer.init()
+pygame.mixer.music.load(r"game assets\mondamusic-dark-ambient-589187.mp3")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1)
+
 
 clock = pygame.time.Clock()
 
@@ -274,7 +280,7 @@ while run == True:
                 player.rect.topleft = (260, 200)
                     
                 enemy.hp = 5
-                player.rect.topleft = (260, 200)
+                enemy.rect.topleft = (700, 200)
                     
                 task = "Знайди ключ" 
                 task = "Знайди ключ" 
@@ -302,7 +308,7 @@ while run == True:
             screen.blit(background_3, (0,0))
                     
             victory_text = font.render("ПЕРЕМОГА!", True, (255,255,255))
-            screen.blit(victory_text, (380, 100))
+            screen.blit(victory_text, (390, 130))
                     
             end_text = hint_font.render("Ви втікли з особняка", True, (255, 255, 255))
             screen.blit(end_text, (390, 160))
