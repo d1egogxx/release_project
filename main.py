@@ -135,7 +135,7 @@ table = pygame.Rect(400, 270, 200, 180)
 exit = pygame.Rect(72, 190, 100, 180)
 
 restart_button = pygame.Rect(WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 + 70, 300, 60)
-
+start_button = pygame.Rect(WINDOW_WIDTH // 2 - 150, WINDOW_HEIGHT // 2 + 40, 300, 60)
 task = "Знайди ключ" 
 hint = ""
 door_open = False
@@ -153,13 +153,24 @@ victory = False
 damage_cooldown = 0
 game_over = False
 
+start_menu = True
+
 
 while run == True:
-
-    
     clock.tick(FPS)
     
-    if game_over == False:
+    if start_menu:
+        screen.fill((0, 0, 0))
+        title_text = font.render("MY RELEASE PROJECT", True, (200,0,0))
+        screen.blit(title_text, (WINDOW_WIDTH // 2 - title_text.get_width() // 2, WINDOW_HEIGHT // 2 - 120))
+        
+        pygame.draw.rect(screen, (120, 10, 10), start_button)
+        start_text = hint_font.render("ПОЧАТИ ГРУ", True, (255, 255, 255))
+        
+        screen.blit(start_text, (start_button.centerx - start_text.get_width() // 2,
+                start_button.centery - start_text.get_height() // 2))
+    
+    elif game_over == False and start_menu == False:
     
         if damage_cooldown > 0:
             damage_cooldown -= 1
@@ -272,8 +283,14 @@ while run == True:
                 victory = True
             else:
                 entered_code = ""
+                
+
             
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            
+            if start_menu and start_button.collidepoint(event.pos):
+                start_menu = False
+                
             if game_over and restart_button.collidepoint(event.pos):
                     
                 player.hp = 5
