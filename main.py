@@ -60,7 +60,7 @@ class Player(GameSprite):
     def __init__(self, filename, x, y, w, h, speed):
         super().__init__(filename, x, y, w, h)
         self.speed = speed
-        self.hp = 5
+        self.hp = 4
         self.damage = 1
     
         
